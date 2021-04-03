@@ -1,0 +1,34 @@
+# Project: blockchain
+# Makefile created by Dev-C++ 5.5.3
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+OBJ      = main.o sha256.o mining.o
+LINKOBJ  = main.o sha256.o mining.o
+LIBS     = -L"D:/program_file/Dev-Cpp/MinGW32/lib" -L"D:/program_file/Dev-Cpp/MinGW32/mingw32/lib" -static-libstdc++ -static-libgcc -g3
+INCS     = -I"D:/program_file/Dev-Cpp/MinGW32/include"
+CXXINCS  = -I"D:/program_file/Dev-Cpp/MinGW32/include" -I"D:/program_file/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.7.2/include/c++"
+BIN      = blockchain.exe
+CXXFLAGS = $(CXXINCS) -g3
+CFLAGS   = $(INCS) -g3
+RM       = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+main.o: main.c
+	$(CC) -c main.c -o main.o $(CFLAGS)
+
+sha256.o: sha256.c
+	$(CC) -c sha256.c -o sha256.o $(CFLAGS)
+
+mining.o: mining.c
+	$(CC) -c mining.c -o mining.o $(CFLAGS)
