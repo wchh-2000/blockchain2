@@ -4,8 +4,8 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = main.o sha256.o mining.o
-LINKOBJ  = main.o sha256.o mining.o
+OBJ      = main.o sha256.o mining.o ecc.o
+LINKOBJ  = main.o sha256.o mining.o ecc.o
 LIBS     = -L"D:/program_file/Dev-Cpp/MinGW32/lib" -L"D:/program_file/Dev-Cpp/MinGW32/mingw32/lib" -static-libstdc++ -static-libgcc -g3
 INCS     = -I"D:/program_file/Dev-Cpp/MinGW32/include"
 CXXINCS  = -I"D:/program_file/Dev-Cpp/MinGW32/include" -I"D:/program_file/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.7.2/include/c++"
@@ -32,3 +32,6 @@ sha256.o: sha256.c
 
 mining.o: mining.c
 	$(CC) -c mining.c -o mining.o $(CFLAGS)
+
+ecc.o: ecc.c
+	$(CC) -c ecc.c -o ecc.o $(CFLAGS)

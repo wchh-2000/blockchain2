@@ -2,12 +2,14 @@
 #include <stdlib.h>
 #include <string.h> 
 #include "mining.h"
-void struct2str(BLOCK *p,BYTE *s)
+typedef unsigned char BYTE;             // 8-bit byte
+void struct2str(BYTE *p,BYTE *s,int structBytes)
 //区块结构体转为字符数组 用于计算hash 
+//输入参数时把结构体指针转为字符指针 structBytes为结构体所占字节数,可小于实际结构体容量，即部分转换 
 //每次运行字符数组会被更新 
 {
 	int i;
-	for(i=0;i<blockBytes;i++)
+	for(i=0;i<structBytes;i++)
 		s[i]=*((BYTE *)p+i);
 	s[i]="\0";//以空字符结尾 便于以后得到字符长度 
 }
@@ -20,17 +22,62 @@ void long2str(long long n,BYTE *s)//long long 64bits 分成8个BYTE
 }
 void Block_init(BLOCK *p,BYTE *hash)
 {
-	int i;
+	int i,n;
+	int N=5;//创建N条交易记录 
+	BYTE str[transBytes+1];//用于存储交易记录 构成字符串生成hash 
+	SHA256_CTX ctx;
+	sha256_init(&ctx);
+	
 	p->chain_version=101;
-	//memset(p->prev_hash, 0, sizeof(BYTE) * 32);
-	for(i=0;i<32;i++)
+	for(i=0;i<32;i++)//记录前一个hash 
 		p->prev_hash[i]=hash[i];
 	p->nonce1=0;
 	p->nonce2=0;
 	for(i=0;i<32;i++)
 		p->coinbase[i]=rand()%256;//0-255随机数 
 	p->award=100;
-	//p->bill[0].from=
+	
+	for(n=0;n<N;n++)//创建N条交易记录 
+	{
+		BYTE privateKey_f[32], privateKey_t[32],publicKey_f[33],publicKey_t[33],trans_hash[32],signature[64];
+		Transaction trans;//临时存储交易记录 
+		for(i=0;i<32;i++)//随机生成私钥 
+		{
+			privateKey_f[i]=rand()%256;
+			privateKey_t[i]=rand()%256;
+		}
+		ecc_make_key(publicKey_f,privateKey_f);//ecc生成公钥 
+		ecc_make_key(publicKey_t,privateKey_t);
+		
+		trans.amount=rand()%10000;//随机生成交易金额 
+		for(i=0;i<33;i++)//记录公钥 
+		{
+			trans.from[i]=publicKey_f[i]; 
+			trans.to[i]=publicKey_t[i]; 
+		}
+		//printf("sizeof trans:%d\n",sizeof(trans));
+		struct2str((BYTE *)&trans,str,transBytes); //交易记录转字符串 
+		
+		sha256_update(&ctx, str, strlen(str));
+		sha256_final(&ctx, trans_hash);//生成交易记录hash 
+		if(n==4)//第五笔交易 
+		{
+			privateKey_f[3]+=1;//修改私钥 模仿假的私钥 验证数字签名应该不通过 
+		}
+		ecdsa_sign(privateKey_f,trans_hash,signature);//使用from的私钥对交易记录进行数字签名 
+		if(ecdsa_verify(publicKey_f,trans_hash,signature))
+		{
+			printf("transaction %d verified\n",n+1);
+			for(i=0;i<64;i++)//记录数字签名 
+			{
+				trans.signature[i]=signature[i];
+			}
+			p->trans[n]=trans;//存在区块中 
+		}
+		else
+			printf("transaction %d verification failed\n",n+1);
+		
+	}
 }
 int Mining(SHA256_CTX *ctx,BLOCK *p,BYTE *hash,int n0)
 //找到nonce1 nonce2 使得block的hash满足开头有n0个2进制0 
@@ -40,7 +87,7 @@ int Mining(SHA256_CTX *ctx,BLOCK *p,BYTE *hash,int n0)
 	int v;
 	int k;
 	BYTE str[blockBytes+1];//以空字符结尾 所以+1 
-	struct2str(p,str);
+	struct2str((BYTE *)p,str,blockBytes);
 	v=verify(ctx,str,hash,n0);
 	
 	for(i=0;v==0&& i<MaxNum;i++)
@@ -89,4 +136,22 @@ int verify(SHA256_CTX *ctx,BYTE *str,BYTE *hash,int n)
 		case 7: if(hash[i]<=0x01) return 1; break;
 	}
 	return 0;
+}
+
+void print_block(BLOCK *p)
+{
+	int j,n;
+	int N=5;
+	puts("previous hash:");
+	for(j=0;j<32;j++)
+		printf("%x ",p->prev_hash[j]);
+	printf("\nnonce1:%lld nonce2:%lld\n",p->nonce1,p->nonce2);//注意lld才能正确显示long long 
+	/*
+	for(n=0;n<N;n++)
+	{
+		printf("\n%d th transation signature:",n+1);
+		for(j=0;j<64;j++)
+			printf("%x ",p->trans[n].signature[j]);
+	}
+	*/ 
 }

@@ -15,16 +15,14 @@ int main(void) {
 	for(i=0;i<10;i++)//生成10个区块 
 	{
 		BLOCK *block=(BLOCK *)malloc(sizeof(BLOCK));//分配的内存跳出循环仍存在 
+		puts("creating new block:\n");
 		Block_init(block,hash);//创建初始区块 hash为上一个区块的 第一个区块hash=0 
 		Mining(&ctx,block,hash,N0); 
 		
-		//printf("%d \n",sizeof(*block));
-		printf("info of %d th block:\n",i+1);
-		printf("nonce1:%lld nonce2:%lld\n",block->nonce1,block->nonce2);//注意lld才能正确显示long long  
-		printf("previous hash:");
-		for(j=0;j<32;j++)
-			printf("%x ",block->prev_hash[j]);
-		printf("\nhash:");
+		//printf("sizeof block:%d size of transaction:%d\n",sizeof(*block),sizeof(block->trans));
+		printf("\ninfo of %d th block:\n",i+1);
+		print_block(block);
+		printf("hash:");
 		for(j=0;j<32;j++)
 			printf("%x ",hash[j]);
 		puts("\n");
@@ -52,7 +50,7 @@ int main(void) {
 		pre->next=block;//新区块加入链，上一个区块记录新区块地址 
 		pre=block;//用最新的区块地址更新pre
 	}
-	//printf("%lld",h->next->next->nonce2);//验证链建好 
+	//printf("%lld",h->next->next->nonce2);//验证链建好 第三个block的nonce2 
 	pre->next=NULL;
 	return 0;
 	system("pause");
