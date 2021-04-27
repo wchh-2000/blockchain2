@@ -6,12 +6,12 @@ CC       = gcc.exe
 WINDRES  = windres.exe
 OBJ      = main.o sha256.o mining.o ecc.o
 LINKOBJ  = main.o sha256.o mining.o ecc.o
-LIBS     = -L"D:/program_file/Dev-Cpp/MinGW32/lib" -L"D:/program_file/Dev-Cpp/MinGW32/mingw32/lib" -static-libstdc++ -static-libgcc -g3
-INCS     = -I"D:/program_file/Dev-Cpp/MinGW32/include"
+LIBS     = -L"D:/program_file/Dev-Cpp/MinGW32/lib" -L"D:/program_file/Dev-Cpp/MinGW32/mingw32/lib" -L"D:/program_file/Dev-Cpp/pthreads-w32-2-9-1-release/Pre-built.2/lib" -static-libgcc -lws2_32 -lpthreadGC2 -g3
+INCS     = -I"D:/program_file/Dev-Cpp/MinGW32/include" -I"D:/program_file/Dev-Cpp/pthreads-w32-2-9-1-release/Pre-built.2/include"
 CXXINCS  = -I"D:/program_file/Dev-Cpp/MinGW32/include" -I"D:/program_file/Dev-Cpp/MinGW32/lib/gcc/mingw32/4.7.2/include/c++"
 BIN      = blockchain.exe
-CXXFLAGS = $(CXXINCS) -g3
-CFLAGS   = $(INCS) -g3
+CXXFLAGS = $(CXXINCS) -g3 -lpthread
+CFLAGS   = $(INCS) -g3 -lpthread
 RM       = rm -f
 
 .PHONY: all all-before all-after clean clean-custom

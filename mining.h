@@ -6,7 +6,7 @@
 
 #define blockBytes 816 //每个区块所占字节数 96+transaction*n 区块指针next不参与计算hash  
 #define transBytes 80 //每笔交易记录所占字节数 不算数字签名 
-#define MaxNum 10000000 //试nonce1,nonce2的最大数 
+#define MaxNum 5000 //试nonce1,nonce2的最大数 
 //typedef unsigned char BYTE;             // 8-bit byte
 
 typedef struct {
@@ -30,6 +30,6 @@ typedef struct BLOCK{
 void print_block(BLOCK *p);
 
 void Block_init(BLOCK *p,BYTE *hash);
-int Mining(SHA256_CTX *ctx,BLOCK *p,BYTE *hash,int n0);
+int Mining(BLOCK *p,BYTE *hash,int n0);
 //找到nonce1 nonce2 使得block的hash满足开头有n0个2进制0 
 #endif  
