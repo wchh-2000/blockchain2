@@ -3,7 +3,7 @@
 
  交易数据格式：
  
- 
+ ''' C
  typedef struct {
  
 	BYTE from[33];//264bits 来源者公钥 
@@ -15,12 +15,12 @@
 	BYTE signature[64];//512 ecc数字签名  
 	
 	}Transaction; //实际占144bytes(由于数据对齐) 
-
+'''
 使用ECDSA算法实现数字签名
 
  区块数据格式：
  
- 
+ ''' C
 typedef struct BLOCK{
 
 	BYTE prev_hash[32];//256前一个哈希值
@@ -40,21 +40,22 @@ typedef struct BLOCK{
 	struct BLOCK *next;//(4bytes) 由于struct对齐，占8bytes  
 	
 	} BLOCK;//824 bytes
+'''
 
 检验数字签名是否合法：
-
-		if(n==4)//第五笔交易  模仿假的私钥
-		{
-			privateKey_f[3]+=1;//修改私钥 验证数字签名应该不通过 
-		}
-		ecdsa_sign(privateKey_f,trans_hash,signature);//使用from的私钥对交易记录进行数字签名 
-		if(ecdsa_verify(publicKey_f,trans_hash,signature))
-		{
-			printf("transaction %d verified\n",n+1);
-			//...存储
-		}
-		else
-			printf("transaction %d verification failed\n",n+1);
-		
+''' C
+	if(n==4)//第五笔交易  模仿假的私钥
+	{
+		privateKey_f[3]+=1;//修改私钥 验证数字签名应该不通过 
+	}
+	ecdsa_sign(privateKey_f,trans_hash,signature);//使用from的私钥对交易记录进行数字签名 
+	if(ecdsa_verify(publicKey_f,trans_hash,signature))
+	{
+		printf("transaction %d verified\n",n+1);
+		//...存储
+	}
+	else
+		printf("transaction %d verification failed\n",n+1);
+'''
 结果见下图：
 ![image](https://user-images.githubusercontent.com/69345371/113707839-0e98cd80-9713-11eb-84b9-3ca7c08ae816.png)
